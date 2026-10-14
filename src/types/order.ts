@@ -10,6 +10,7 @@ export interface Order{
 
 export interface OrderItem {
     productId: number;
+    originalPrice:number
     orderedQuantity: number;
 }
 
