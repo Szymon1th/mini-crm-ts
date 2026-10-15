@@ -5,3 +5,4 @@ const user : User = {
     name: "Jan Kowalski",
     email: "jan@example.com",
 }
+
