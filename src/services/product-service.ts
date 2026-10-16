@@ -50,6 +50,7 @@ class ProductService{
 
     return { ...foundProduct };
 }
-
-
 }
+
+export = ProductService;
+
