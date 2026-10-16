@@ -14,3 +14,9 @@ export interface OrderItem {
     orderedQuantity: number;
 }
 
+
+export interface OrderItemInput {
+    productId : number,
+    orderedQuantity: number
+}
+
