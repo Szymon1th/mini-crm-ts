@@ -15,7 +15,7 @@ class CustomerService{
         if(customer.id !== undefined && Number.isInteger(customer.id) && Number.isFinite(customer.id) && customer.id > 0) {
             this.customerList.push(customer);
             return true
-}
+}       
         return false
     }
     public getCustomer(id:number) : CustomerUser | undefined{
@@ -51,3 +51,5 @@ class CustomerService{
     }
 
 }
+
+export = CustomerService;
