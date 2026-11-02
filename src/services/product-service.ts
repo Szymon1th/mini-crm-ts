@@ -1,18 +1,37 @@
+import { isProduct } from "../guards/product-guard";
 import type { Product } from "../types/product";
 
 class ProductService{
     private productList :Product[] = []
 
-    public addProduct(product : Product) : void | boolean{
-        const isTaken = this.productList.some(p=>p.id === product.id)
-
-        if(isTaken) return false   
-        if(product.name!== undefined && product.name.trim().length === 0) return false
-        if (product.price !== undefined && (isNaN(product.price) || product.price < 0)) return false;
-        if((product.stock!==undefined  && (isNaN(product.stock) || product.stock <0)))return false
         
-        this.productList.push(product)
+    public addProduct(product: unknown): void {
+
+        if (!isProduct(product)) {
+            throw new Error("Invalid product type");
+        }
+
+        const isTaken = this.productList.some(p => p.id === product.id);
+
+        if (isTaken) {
+            throw new Error("Duplicate product ID");
+        }
+
+        if (product.name.trim().length === 0) {
+            throw new Error("Invalid product name");
+        }
+
+        if (!Number.isFinite(product.price) || product.price < 0) {
+            throw new Error("Invalid product price");
+        }
+
+        if (!Number.isFinite(product.stock) || product.stock < 0) {
+            throw new Error("Invalid product stock");
+        }
+
+        this.productList.push(product);
     }
+
     public getProduct(id:number){
         return this.productList.find(product=>product.id === id)
     }
