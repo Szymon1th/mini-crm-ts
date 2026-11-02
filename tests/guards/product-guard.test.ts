@@ -1,4 +1,4 @@
-import { isProduct } from "./product-guard";
+import { isProduct } from "../../src/guards/product-guard";
 import { describe, it, expect } from "vitest";
 
 describe("ProductGuard", () => {

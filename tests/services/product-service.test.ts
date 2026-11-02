@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import ProductService from "./product-service";
+import ProductService from "../../src/services/product-service";
 
 describe("ProductService", () => {
     let productService: ProductService;

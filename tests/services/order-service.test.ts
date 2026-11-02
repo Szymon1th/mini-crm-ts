@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 
-import ProductService from "./product-service";
-import CustomerService from "./customer-service";
-import OrderService from "./order-service";
+import ProductService from "../../src/services/product-service";
+import CustomerService from "../../src/services/customer-service";
+import OrderService from "../../src/services/order-service";
 
-import type { Product } from "../types/product";
-import type { CustomerUser } from "../types/user";
-import type { OrderItemInput } from "../types/order";
+import type { Product } from "../../src/types/product"
+import type { CustomerUser } from "../../src/types/user"
+import type { OrderItemInput } from "../../src/types/order"
 
 describe("OrderService", () => {
     let productService: ProductService;

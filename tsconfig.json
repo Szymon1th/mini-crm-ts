@@ -44,7 +44,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/services/product-service.test.ts"]
   
 }
 
