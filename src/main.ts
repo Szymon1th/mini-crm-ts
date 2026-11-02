@@ -63,15 +63,15 @@ const items: OrderItemInput[] = [
 ];
 
 // 6. Przekazujemy dane do OrderService
-// console.log("\nTworzenie zamówienia:");
-// const result = orderService.createOrder(1, items);
-// console.log(result);
+console.log("\nTworzenie zamówienia:");
+const result = orderService.createOrder(1, items);
+console.log(result);
 
 // 7. Sprawdzamy zapisane zamówienie
-// console.log("\nZamówienie o ID 1:");
-// console.log(orderService.getOrder(1));
+console.log("\nZamówienie o ID 1:");
+console.log(orderService.getOrder(1));
 
 // // 8. Sprawdzamy stan magazynowy po zamówieniu
-// console.log("\nStan magazynowy po zamówieniu:");
-// console.log("Klawiatura:", productService.getProduct(1));
-// console.log("Mysz:", productService.getProduct(2));
+console.log("\nStan magazynowy po zamówieniu:");
+console.log("Klawiatura:", productService.getProduct(1));
+console.log("Mysz:", productService.getProduct(2));

@@ -39,7 +39,6 @@ class OrderService {
         order_item: OrderItemInput[]
     ): Order | boolean {
 
-        // ZMIANA 1: najpierw sprawdzamy klienta i niepustą listę produktów.
         if (this.myCustomerService.findCustomer(customerIdGet) !== true) {
             return false;
         }
@@ -48,8 +47,6 @@ class OrderService {
             return false;
         }
 
-        // ZMIANA 2: zbieramy dane o produktach i łączną ilość każdego produktu.
-        // Na tym etapie NIE zmieniamy stanu magazynowego.
         const productsToOrder: {
             input: OrderItemInput;
             product: Product;
@@ -58,7 +55,6 @@ class OrderService {
         const quantityByProduct = new Map<number, number>();
 
         for (const item of order_item) {
-            // ZMIANA 3: jawna walidacja danych wejściowych.
             if (
                 !Number.isInteger(item.productId) ||
                 item.productId <= 0 ||
@@ -70,17 +66,14 @@ class OrderService {
 
             const product = this.myProductService.getProduct(item.productId);
 
-            // Nie używamy findProduct() i getProduct() do dwóch osobnych
-            // odczytów — getProduct() wystarczy, aby sprawdzić istnienie
-            // produktu i uzyskać jego dane.
+  
             if (product === undefined) {
                 return false;
             }
 
             productsToOrder.push({ input: item, product });
 
-            // ZMIANA 4: sumujemy ilości, gdy ten sam produkt występuje
-            // w zamówieniu więcej niż raz.
+        
             const currentQuantity = quantityByProduct.get(item.productId) ?? 0;
 
             quantityByProduct.set(
@@ -89,8 +82,7 @@ class OrderService {
             );
         }
 
-        // ZMIANA 5: sprawdzamy dostępność wszystkich produktów
-        // przed jakąkolwiek zmianą magazynu.
+      
         for (const [productId, totalQuantity] of quantityByProduct) {
             const product = this.myProductService.getProduct(productId);
 
@@ -99,8 +91,7 @@ class OrderService {
             }
         }
 
-        // ZMIANA 6: tworzymy pozycję zamówienia dla KAŻDEGO elementu wejściowego.
-        // Cena jest pobierana z produktu i zapisywana w chwili składania zamówienia.
+        
         const actualOrder: OrderItem[] = productsToOrder.map(({ input, product }) => ({
             productId: product.id,
             originalPrice: product.price,
@@ -114,12 +105,9 @@ class OrderService {
             status: "pending"
         };
 
-        // ZMIANA 7: magazyn aktualizujemy dopiero po pomyślnej walidacji
-        // wszystkich danych. Nie ma już warunku tempSum > 2.
         for (const [productId, totalQuantity] of quantityByProduct) {
             const product = this.myProductService.getProduct(productId);
 
-            // Produkt był już zweryfikowany wyżej; zabezpieczenie typów.
             if (product === undefined) {
                 return false;
             }
