@@ -1,6 +1,6 @@
 import { CustomerUser,AdminUser,User } from "../types/user";
 
-function isUser(value:unknown):value is User{
+export function isUser(value:unknown):value is User{
     if(value===null) return false
     if(Array.isArray(value)) return false
     if(typeof value !== "object") return false
@@ -12,7 +12,7 @@ function isUser(value:unknown):value is User{
     return true
 }
 
-function isCustomerUser(value:unknown): value is CustomerUser {
+export function isCustomerUser(value:unknown): value is CustomerUser {
 
     if(!isUser(value)) return false
 
@@ -23,7 +23,7 @@ function isCustomerUser(value:unknown): value is CustomerUser {
     return true
 }
 
-function isAdminUser(value:unknown): value is AdminUser{
+export function isAdminUser(value:unknown): value is AdminUser{
     if(!isUser(value)) return false
 
     if(!("permissions" in value) || !(Array.isArray(value.permissions) && value.permissions.every(permission=>
