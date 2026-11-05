@@ -1,9 +1,11 @@
 import type {CustomerUser} from "../types/user"
+import { isCustomerUser } from "../guards/customer-guard"
 
 class CustomerService{
     private customerList : CustomerUser[] = []
 
-    public addCustomer(customer : CustomerUser) : boolean{
+    public addCustomer(customer : unknown) : boolean{
+        if(!isCustomerUser(customer)) return false
         const isTaken = this.customerList.some(c=>c.id===customer.id)
 
         if(isTaken) return false
@@ -13,9 +15,9 @@ class CustomerService{
         if(customer.address!== undefined && customer.address.trim().length === 0) return false
 
         if(customer.id !== undefined && Number.isInteger(customer.id) && Number.isFinite(customer.id) && customer.id > 0) {
-            this.customerList.push(customer);
+            this.customerList.push({...customer});
             return true
-}       
+        }       
         return false
     }
     public getCustomer(id:number) : CustomerUser | undefined{
