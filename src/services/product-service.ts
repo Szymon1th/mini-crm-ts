@@ -1,20 +1,14 @@
 import { isProduct } from "../guards/product-guard";
 import type { Product } from "../types/product";
+import { Repository } from "../repositories/repository";
 
 class ProductService{
-    private productList :Product[] = []
-
+    private productRepository = new Repository<Product>
         
     public addProduct(product: unknown): void {
 
         if (!isProduct(product)) {
             throw new Error("Invalid product type");
-        }
-
-        const isTaken = this.productList.some(p => p.id === product.id);
-
-        if (isTaken) {
-            throw new Error("Duplicate product ID");
         }
 
         if (product.name.trim().length === 0) {
@@ -29,45 +23,44 @@ class ProductService{
             throw new Error("Invalid product stock");
         }
 
-        this.productList.push(product);
+        this.productRepository.addItem(product)
     }
 
     public getProduct(id:number){
-        return this.productList.find(product=>product.id === id)
+        return this.productRepository.getById(id)
     }
-
-   public findProduct(id: number, name?: string): boolean {
-    return this.productList.some(product => 
-        product.id === id || (name !== undefined && product.name === name)
-    );
-}
 
    public updateProduct(
-    idOrigin: number, 
-    newName?: string, 
-    newPrice?: number, 
-    newStock?: number
-):Product | undefined | boolean{
+    id: number,
+    changes: Partial<Omit<Product, "id">>
+): Product | undefined | false {
 
-    if(newName!== undefined && newName.length === 0) return false 
-    if((newPrice!==undefined && newPrice < 0)) return false
-    if(newStock!==undefined && newStock < 0) return false
+    const isExist = this.getProduct(id) !== undefined;
+    if (!isExist) return undefined;
 
-    const foundProduct = this.productList.find(product => product.id === idOrigin)
-
-    if(!foundProduct) return undefined
-
-    if (newName !== undefined && newName.length > 0) {
-        foundProduct.name = newName;
-    }
-    if (newPrice !== undefined && newPrice >= 0) {
-        foundProduct.price = newPrice;
-    }
-    if (newStock !== undefined && newStock >= 0) {
-        foundProduct.stock = newStock;
+    if (changes.name !== undefined) {
+        if (changes.name.trim().length === 0 || changes.name.trim().length > 16) {
+            return false;
+        }
     }
 
-    return { ...foundProduct };
+    if (changes.price !== undefined) {
+        if (!Number.isFinite(changes.price) || changes.price < 0) {
+            return false;
+        }
+    }
+
+    if (changes.stock !== undefined) {
+        if (!Number.isInteger(changes.stock) || changes.stock < 0) {
+            return false;
+        }
+    }
+
+    if (Object.keys(changes).length === 0) {
+        return false;
+    }
+
+    return this.productRepository.update(id, changes);
 }
 }
 
