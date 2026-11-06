@@ -1,4 +1,4 @@
-class Repository<T extends {id:number}>{
+export class Repository<T extends {id:number}>{
     private items : T[] = []
 
     addItem(item:T):void{
