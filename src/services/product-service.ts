@@ -82,6 +82,37 @@ class ProductService {
 
         return updatedProduct;
     }
+
+    public increaseStock(productId: number, quantity: number):Product|undefined{
+
+        if (!Number.isSafeInteger(productId))
+            throw new Error("ProductID is not a safe integer");
+
+        if (productId <= 0)
+            throw new Error("ProductID should be greater than 0");
+
+
+        if (!Number.isSafeInteger(quantity) || quantity <= 0) {
+            throw new Error("Invalid product quantity");
+        }
+
+        const product = this.getProduct(productId);
+
+        if (!product) return undefined
+
+        const newStock = product.stock + quantity;
+
+        if (!Number.isSafeInteger(newStock)) {
+            throw new Error("Resulting stock exceeds safe integer limit");
+        }
+
+        const updatedProduct = this.productRepository.update(productId,{
+            stock:newStock
+        })
+
+        return updatedProduct
+        
+    }
 }
 
 export = ProductService;
