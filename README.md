@@ -78,7 +78,7 @@ The application is organized into several layers:
 Clone the repository:
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/Szymon1th/mini-crm-ts.git
 ```
 
 Navigate to the project directory:
