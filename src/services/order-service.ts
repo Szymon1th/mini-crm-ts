@@ -1,5 +1,5 @@
 
-import type { Order, OrderItem, OrderItemInput } from "../types/order";
+import type { Order, OrderItem, OrderItemInput, StatusOrder } from "../types/order";
 import ProductService = require("./product-service");
 import CustomerService = require("./customer-service");
 import type { Product } from "../types/product";
@@ -19,79 +19,87 @@ class OrderService {
     }
 
     public getOrder(id: number): Order | undefined {
-        if (!Number.isInteger(id) || !Number.isFinite(id) || id <= 0) {
+        if (!Number.isSafeInteger(id) || id <= 0) {
             return undefined;
         }
 
-        return this.orderList.find(order => order.id === id);
+        const copyOfOrder = this.orderList.find(order => order.id === id);
+
+        if (!copyOfOrder) return undefined;
+
+        return {
+            ...copyOfOrder,
+            products: copyOfOrder.products.map(order => ({ ...order }))
+        };
     }
 
     public findOrder(id: number): boolean | undefined {
-        if (!Number.isInteger(id) || !Number.isFinite(id) || id <= 0) {
+        if (!Number.isSafeInteger(id) || id <= 0) {
             return undefined;
         }
 
         return this.orderList.some(order => order.id === id);
     }
 
-    public createOrder(
-        customerIdGet: number,
-        order_item: OrderItemInput[]
-    ): Order | boolean {
+    public getAllOrders(): Order[] {
+        return this.orderList.map(order => ({
+            ...order,
+            products: order.products.map(orderProducts => ({ ...orderProducts }))
+        }));
+    }
 
-        if (this.myCustomerService.findCustomer(customerIdGet) !== true) {
-            return false;
+    public createOrder(customerIdGet: number, order_item: OrderItemInput[]): Order {
+        const customer = this.myCustomerService.getCustomer(customerIdGet);
+
+        if (!customer) throw new Error("Customer not found");
+
+        if (!Array.isArray(order_item) || order_item.length === 0) {
+            throw new Error("Order cannot be empty");
         }
 
-        if (order_item.length === 0) {
-            return false;
-        }
-
-        const productsToOrder: {
-            input: OrderItemInput;
-            product: Product;
-        }[] = [];
+        const productsToOrder: { input: OrderItemInput; product: Product }[] = [];
 
         const quantityByProduct = new Map<number, number>();
 
         for (const item of order_item) {
             if (
-                !Number.isInteger(item.productId) ||
+                !Number.isSafeInteger(item.productId) ||
                 item.productId <= 0 ||
-                !Number.isInteger(item.orderedQuantity) ||
+                !Number.isSafeInteger(item.orderedQuantity) ||
                 item.orderedQuantity <= 0
             ) {
-                return false;
+                throw new Error("Invalid order item");
             }
 
             const product = this.myProductService.getProduct(item.productId);
 
-  
-            if (product === undefined) {
-                return false;
-            }
+            if (!product) throw new Error("Product doesn't exist");
 
             productsToOrder.push({ input: item, product });
 
-        
             const currentQuantity = quantityByProduct.get(item.productId) ?? 0;
 
-            quantityByProduct.set(
-                item.productId,
-                currentQuantity + item.orderedQuantity
-            );
+            const newQuantity = currentQuantity + item.orderedQuantity;
+
+            if (!Number.isSafeInteger(newQuantity)) {
+                throw new Error("Invalid total product quantity");
+            }
+
+            quantityByProduct.set(item.productId, newQuantity);
         }
 
-      
         for (const [productId, totalQuantity] of quantityByProduct) {
             const product = this.myProductService.getProduct(productId);
 
-            if (product === undefined || product.stock < totalQuantity) {
-                return false;
+            if (!product) {
+                throw new Error("Product doesn't exist");
+            }
+
+            if (product.stock < totalQuantity) {
+                throw new Error("Insufficient product stock");
             }
         }
 
-        
         const actualOrder: OrderItem[] = productsToOrder.map(({ input, product }) => ({
             productId: product.id,
             originalPrice: product.price,
@@ -106,19 +114,126 @@ class OrderService {
         };
 
         for (const [productId, totalQuantity] of quantityByProduct) {
-            const product = this.myProductService.getProduct(productId);
+            const updatedProduct = this.myProductService.decreaseStock(
+                productId,
+                totalQuantity
+            );
 
-            if (product === undefined) {
-                return false;
+            if (!updatedProduct) {
+                throw new Error("Product not found");
             }
-
-            product.stock -= totalQuantity;
         }
 
         this.orderList.push(orderProduct);
         this.orderNumber += 1;
 
-        return orderProduct;
+        return {
+            ...orderProduct,
+            products: orderProduct.products.map(product => ({ ...product }))
+        };
+    }
+
+    public updateOrderStatus(orderId: number, status: StatusOrder): Order {
+        if (!Number.isSafeInteger(orderId)) {
+            throw new Error("OrderId is not a safe integer");
+        }
+
+        if (orderId <= 0) {
+            throw new Error("OrderId should be greater than 0");
+        }
+
+        const actualOrder = this.orderList.find(order => order.id === orderId);
+
+        if (!actualOrder) {
+            throw new Error("Order doesn't exist");
+        }
+
+        const allowedTransitions: Record<StatusOrder, StatusOrder[]> = {
+            pending: ["paid"],
+            paid: ["shipped"],
+            shipped: [],
+            cancelled: []
+        };
+
+        const isStatusAvailable = allowedTransitions[actualOrder.status].includes(status);
+
+        if (!isStatusAvailable) {
+            throw new Error("Can't change status");
+        }
+
+        actualOrder.status = status;
+
+        return {
+            ...actualOrder,
+            products: actualOrder.products.map(product => ({ ...product }))
+        };
+    }
+
+    public cancelOrder(orderId: number): Order {
+        if (!Number.isSafeInteger(orderId)) {
+            throw new Error("OrderId is not a safe integer");
+        }
+
+        if (orderId <= 0) {
+            throw new Error("OrderId should be greater than 0");
+        }
+
+        const actualOrder = this.orderList.find(order => order.id === orderId);
+
+        if (!actualOrder) {
+            throw new Error("Order doesn't exist");
+        }
+
+        const cancellableStatuses: StatusOrder[] = ["pending", "paid"];
+
+        const isStatusAvailable = cancellableStatuses.includes(actualOrder.status);
+
+        if (!isStatusAvailable) {
+            throw new Error("Cannot cancel order in this status");
+        }
+
+        const quantityByProduct = new Map<number, number>();
+
+        for (const product of actualOrder.products) {
+            const currentQuantity = quantityByProduct.get(product.productId) ?? 0;
+            const newQuantity = currentQuantity + product.orderedQuantity;
+
+            if (!Number.isSafeInteger(newQuantity)) {
+                throw new Error("Invalid total product quantity");
+            }
+
+            quantityByProduct.set(product.productId, newQuantity);
+        }
+
+        for (const [productId, totalQuantity] of quantityByProduct) {
+            const product = this.myProductService.getProduct(productId);
+
+            if (!product) {
+                throw new Error("Product doesn't exist");
+            }
+
+            if (!Number.isSafeInteger(product.stock + totalQuantity)) {
+                throw new Error("Resulting stock exceeds safe integer limit");
+            }
+        }
+
+        for (const [productId, totalQuantity] of quantityByProduct) {
+            const updatedProduct = this.myProductService.increaseStock(
+                productId,
+                totalQuantity
+            );
+
+            if (!updatedProduct) {
+                throw new Error("Could not restore product stock");
+            }
+        }
+
+        actualOrder.status = "cancelled";
+
+        return {
+            ...actualOrder,
+            products: actualOrder.products.map(product => ({ ...product }))
+        };
     }
 }
 
