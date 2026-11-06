@@ -47,13 +47,11 @@ describe("CustomerService", () => {
                 .toThrow("Invalid customer type");
         });
 
-        // NOWY TEST
         it("odrzuca null", () => {
             expect(() => customerService.addCustomer(null))
                 .toThrow("Invalid customer type");
         });
 
-        // NOWY TEST
         it("odrzuca tablicę zamiast obiektu", () => {
             expect(() => customerService.addCustomer([customer]))
                 .toThrow("Invalid customer type");
@@ -98,7 +96,6 @@ describe("CustomerService", () => {
             })).toThrow("Invalid customer ID");
         });
 
-        // NOWY TEST
         it("odrzuca klienta z niecałkowitym ID", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
@@ -110,7 +107,6 @@ describe("CustomerService", () => {
             expect(() => customerService.addCustomer(customer)).toThrow();
         });
 
-        // NOWY TEST: błędne dane nie powinny dodawać klienta.
         it("nie dodaje klienta po nieudanej walidacji", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
@@ -146,7 +142,6 @@ describe("CustomerService", () => {
                 .toThrow("Id should be grater than 0");
         });
 
-        // NOWY TEST
         it("nie pozwala zmienić klienta przez modyfikację zwróconej kopii", () => {
             const result = customerService.getCustomer(1);
 
@@ -257,7 +252,6 @@ describe("CustomerService", () => {
             })).toBeUndefined();
         });
 
-        // NOWY TEST
         it("nie zmienia danych klienta po nieudanej aktualizacji", () => {
             expect(() => customerService.updateCustomer(1, {
                 name: "   "

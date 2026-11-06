@@ -42,13 +42,11 @@ describe("ProductService", () => {
                 .toThrow("Invalid product type");
         });
 
-        // NOWY TEST: null nie jest poprawnym produktem.
         it("odrzuca null", () => {
             expect(() => productService.addProduct(null))
                 .toThrow("Invalid product type");
         });
 
-        // NOWY TEST: tablica nie jest produktem.
         it("odrzuca tablicę zamiast obiektu", () => {
             expect(() => productService.addProduct([keyboard]))
                 .toThrow("Invalid product type");
@@ -94,7 +92,6 @@ describe("ProductService", () => {
             })).toThrow("Invalid product price");
         });
 
-        // NOWY TEST: cena zero jest dozwolona w obecnej implementacji.
         it("akceptuje cenę równą zero", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
@@ -133,7 +130,6 @@ describe("ProductService", () => {
             expect(productService.getProduct(999)).toBeUndefined();
         });
 
-        // NOWY TEST: modyfikacja kopii nie zmienia danych w Repository.
         it("nie pozwala zmienić produktu przez modyfikację zwróconej kopii", () => {
             const product = productService.getProduct(1);
 
@@ -304,7 +300,6 @@ describe("ProductService", () => {
             )).toThrow("ProductID is not a safe integer");
         });
 
-        // NOWY TEST: zabezpieczenie przed przepełnieniem stanu magazynowego.
         it("odrzuca stock przekraczający Number.MAX_SAFE_INTEGER", () => {
             productService.updateProduct(1, {
                 stock: Number.MAX_SAFE_INTEGER

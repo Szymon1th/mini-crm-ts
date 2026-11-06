@@ -50,7 +50,6 @@ describe("OrderService", () => {
         customerService.addCustomer(customer);
     });
 
-    // CREATE ORDER
 
     describe("createOrder()", () => {
         it("rejects an order for a non-existing customer", () => {
@@ -247,7 +246,6 @@ describe("OrderService", () => {
         });
     });
 
-    // GET ORDER
 
     describe("getOrder()", () => {
         it("returns an existing order", () => {
@@ -282,7 +280,6 @@ describe("OrderService", () => {
         });
     });
 
-    // FIND ORDER
 
     describe("findOrder()", () => {
         it("returns true when an order exists", () => {
@@ -305,7 +302,6 @@ describe("OrderService", () => {
         );
     });
 
-    // GET ALL ORDERS
 
     describe("getAllOrders()", () => {
         it("returns an empty array when no orders exist", () => {
@@ -341,7 +337,6 @@ describe("OrderService", () => {
         });
     });
 
-    // UPDATE ORDER STATUS
 
     describe("updateOrderStatus()", () => {
         it("changes pending status to paid", () => {
@@ -441,7 +436,6 @@ describe("OrderService", () => {
         });
     });
 
-    // CANCEL ORDER
 
     describe("cancelOrder()", () => {
         it("cancels a pending order and restores stock", () => {
