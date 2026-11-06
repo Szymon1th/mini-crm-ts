@@ -34,6 +34,9 @@ class CustomerService{
 
 }
     public getCustomer(id:number) : CustomerUser | undefined{
+        if(!Number.isInteger(id)) throw Error("Id should be ineteger")
+        if(id<=0) throw new Error("Id should be grater than 0")
+
         return this.customerRepository.getById(id)
     }
 
