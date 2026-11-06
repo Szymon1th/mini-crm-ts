@@ -56,6 +56,32 @@ class ProductService {
 
         return this.productRepository.update(id, changes);
     }
+
+    public decreaseStock(productId: number, quantity: number): Product | undefined {
+        const product = this.getProduct(productId);
+
+        if (!product) {
+            return undefined;
+        }
+
+        if (!Number.isInteger(quantity) || !Number.isFinite(quantity) || quantity <= 0) {
+            throw new Error("Invalid product quantity");
+        }
+
+        if (product.stock < quantity) {
+            throw new Error("Insufficient product stock");
+        }
+
+        const updatedProduct = this.productRepository.update(productId, {
+            stock: product.stock - quantity
+        });
+
+        if (!updatedProduct) {
+            throw new Error("Failed to update product stock");
+        }
+
+        return updatedProduct;
+    }
 }
 
 export = ProductService;
