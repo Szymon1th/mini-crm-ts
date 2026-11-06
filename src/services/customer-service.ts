@@ -1,54 +1,69 @@
 import type {CustomerUser} from "../types/user"
 import { isCustomerUser } from "../guards/customer-guard"
+import { Repository } from "../repositories/repository"
 
 class CustomerService{
-    private customerList : CustomerUser[] = []
+    private customerRepository = new Repository<CustomerUser>()
 
-    public addCustomer(customer : unknown) : boolean{
-        if(!isCustomerUser(customer)) return false
-        const isTaken = this.customerList.some(c=>c.id===customer.id)
-
-        if(isTaken) return false
-        if(customer.name!== undefined && customer.name.trim().length === 0) return false
-        if(customer.email!== undefined && customer.email.trim().length === 0) return false
-        if(customer.phone!== undefined && customer.phone.trim().length === 0) return false
-        if(customer.address!== undefined && customer.address.trim().length === 0) return false
-
-        if(customer.id !== undefined && Number.isInteger(customer.id) && Number.isFinite(customer.id) && customer.id > 0) {
-            this.customerList.push({...customer});
-            return true
-        }       
-        return false
+  public addCustomer(customer: unknown): void {
+    if (!isCustomerUser(customer)) {
+        throw new Error("Invalid customer type");
     }
+
+    if (customer.name.trim().length === 0) {
+        throw new Error("Invalid customer name");
+    }
+
+    if (customer.email.trim().length === 0) {
+        throw new Error("Invalid customer email");
+    }
+
+    if (customer.phone.trim().length === 0) {
+        throw new Error("Invalid customer phone");
+    }
+
+    if (customer.address.trim().length === 0) {
+        throw new Error("Invalid customer address");
+    }
+
+    if (!Number.isInteger(customer.id) || !Number.isFinite(customer.id) || customer.id <= 0) {
+        throw new Error("Invalid customer ID");
+    }
+
+    this.customerRepository.addItem(customer);
+
+}
     public getCustomer(id:number) : CustomerUser | undefined{
-        return this.customerList.find(customer => customer.id === id)
+        return this.customerRepository.getById(id)
     }
 
-    public findCustomer(id:number):boolean{
-        return this.customerList.some(customer => customer.id === id)
-    }
-    public updateCustomer(
-        idOrigin:number,
-        newName?:string,
-        newEmail?:string,
-        newPhone?:string,
-        newAddress?:string
-    ):CustomerUser | undefined | boolean{
-        if(newName!== undefined && newName.trim().length === 0) return false 
-        if(newEmail!== undefined && newEmail.trim().length === 0) return false 
-        if(newPhone!== undefined && newPhone.trim().length === 0) return false 
-        if(newAddress!== undefined && newAddress.trim().length === 0) return false 
+    public updateCustomer(id:number,changes:Partial<Omit<CustomerUser,"id">>):CustomerUser | undefined {
+        if(!this.getCustomer(id)) return undefined
 
-        const foundCustomer = this.customerList.find(customer=> customer.id === idOrigin)
+        if(changes.name!==undefined){
+            if (changes.name.trim().length === 0) {
+                throw new Error("Invalid customer name");
+            }
+        }
+        if(changes.email!== undefined){
+             if (changes.email.trim().length === 0) {
+                throw new Error("Invalid customer email");
+            }
+        }
+        if(changes.phone !== undefined){
+            if (changes.phone.trim().length === 0) {
+                throw new Error("Invalid customer phone");
+            }
+        }
+        if(changes.address!== undefined){
+            if (changes.address.trim().length === 0) {
+                throw new Error("Invalid customer address");
+            }
+        }
 
-        if(!foundCustomer) return undefined
+        if(Object.keys(changes).length ===0) throw new Error("No fields provided for update");
 
-        if(newName!== undefined && newName.trim().length > 0) foundCustomer.name = newName
-        if(newEmail!== undefined && newEmail.trim().length > 0) foundCustomer.email = newEmail
-        if(newPhone!== undefined && newPhone.trim().length > 0) foundCustomer.phone = newPhone
-        if(newAddress!== undefined && newAddress.trim().length > 0) foundCustomer.address = newAddress
-
-        return {...foundCustomer};
+        return this.customerRepository.update(id,changes)
 
     }
 
