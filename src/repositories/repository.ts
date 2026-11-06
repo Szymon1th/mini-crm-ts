@@ -10,7 +10,9 @@ class Repository<T extends {id:number}>{
     }
 
     getById(id: number): T | undefined {
-        return this.items.find(el => el.id === id);
+        const item = this.items.find(item => item.id === id);
+        if (!item) return undefined;
+        return { ...item };
     }
     
     exists(id: number): boolean{
@@ -19,5 +21,23 @@ class Repository<T extends {id:number}>{
 
     getAll(): T[]{
         return this.items.map(item=> ({...item}))
+    }
+
+    update(id:number,changes:Partial<Omit<T,"id">>):T|undefined{
+        const index = this.items.findIndex(item=>item.id===id)
+        if(index==-1)return undefined
+
+        const existing = this.items[index]
+
+
+        const updatedItem :T= {
+            ...existing,
+            ...changes
+        } as T
+
+        this.items[index] = updatedItem
+
+        return {...this.items[index]}
+        
     }
 }
