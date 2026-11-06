@@ -7,71 +7,94 @@ import type { Product } from "./types/product";
 import type { CustomerUser } from "./types/user";
 import type { OrderItemInput } from "./types/order";
 
-// 1. Tworzymy trzy instancje serwisów
 const productService = new ProductService();
 const customerService = new CustomerService();
 
-// OrderService otrzymuje referencje do tych samych instancji
 const orderService = new OrderService(
     productService,
     customerService
 );
 
-// 2. Dodajemy produkty do magazynu
 const product1: Product = {
     id: 1,
-    name: "Klawiatura",
+    name: "Keyboard",
     price: 150,
     stock: 10
 };
 
 const product2: Product = {
     id: 2,
-    name: "Mysz",
+    name: "Mouse",
     price: 80,
     stock: 5
 };
 
-console.log("Dodawanie produktów:");
-console.log(productService.addProduct(product1));
-console.log(productService.addProduct(product2));
-
-// 3. Dodajemy klienta
 const customer1: CustomerUser = {
     id: 1,
-    name: "Jan Kowalski",
-    email: "jan@example.com",
+    name: "John Smith",
+    email: "john@example.com",
     phone: "500600700",
-    address: "Warszawa"
+    address: "Warsaw"
 };
 
-console.log("\nDodawanie klienta:");
-console.log(customerService.addCustomer(customer1));
+console.log("\n========== MINI CRM ==========\n");
 
-// 4. Sprawdzamy, czy serwisy przechowują dane
-console.log("\nKlient:");
-console.log(customerService.getCustomer(1));
+console.log("PRODUCT MANAGEMENT");
 
-console.log("\nProdukt 1:");
-console.log(productService.getProduct(1));
+productService.addProduct(product1);
+productService.addProduct(product2);
+
+console.table(productService.getProduct(1));
+console.table(productService.getProduct(2));
 
 
-// 5. Tworzymy dane wejściowe zamówienia
+console.log("\nCUSTOMER MANAGEMENT");
+
+customerService.addCustomer(customer1);
+
+console.table([customerService.getCustomer(1)]);
+
+console.log("\nORDER CREATION");
+
 const items: OrderItemInput[] = [
     { productId: 1, orderedQuantity: 2 },
     { productId: 2, orderedQuantity: 1 }
 ];
 
-// 6. Przekazujemy dane do OrderService
-console.log("\nTworzenie zamówienia:");
-const result = orderService.createOrder(1, items);
-console.log(result);
+const createdOrder = orderService.createOrder(1, items);
 
-// 7. Sprawdzamy zapisane zamówienie
-console.log("\nZamówienie o ID 1:");
-console.log(orderService.getOrder(1));
+console.log("Created order:");
+console.dir(createdOrder, { depth: null });
 
-// // 8. Sprawdzamy stan magazynowy po zamówieniu
-console.log("\nStan magazynowy po zamówieniu:");
-console.log("Klawiatura:", productService.getProduct(1));
-console.log("Mysz:", productService.getProduct(2));
+console.log("\nSTOCK AFTER ORDER CREATION");
+
+console.table([
+    productService.getProduct(1),
+    productService.getProduct(2)
+]);
+
+console.log("\nORDER STATUS UPDATE");
+
+const paidOrder = orderService.updateOrderStatus(
+    createdOrder.id,
+    "paid"
+);
+
+console.dir(paidOrder, { depth: null });
+
+console.log("\nORDER CANCELLATION");
+
+const cancelledOrder = orderService.cancelOrder(
+    createdOrder.id
+);
+
+console.dir(cancelledOrder, { depth: null });
+
+console.log("\nSTOCK AFTER ORDER CANCELLATION");
+
+console.table([
+    productService.getProduct(1),
+    productService.getProduct(2)
+]);
+
+console.log("\n========== END OF DEMO ==========\n");
