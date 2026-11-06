@@ -1,4 +1,4 @@
-type StatusOrder = "pending" | "paid" | "shipped" | "cancelled"
+export type StatusOrder = "pending" | "paid" | "shipped" | "cancelled"
 
 export interface Order{
     id:number,
