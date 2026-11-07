@@ -20,7 +20,7 @@ describe("CustomerService", () => {
     });
 
     describe("addCustomer()", () => {
-        it("dodaje poprawnego klienta", () => {
+        it("adds a valid customer", () => {
             const newCustomer: CustomerUser = {
                 ...customer,
                 id: 2,
@@ -34,7 +34,7 @@ describe("CustomerService", () => {
             expect(customerService.getCustomer(2)).toEqual(newCustomer);
         });
 
-        it("odrzuca klienta z niepoprawną strukturą", () => {
+        it("rejects a customer with an invalid structure", () => {
             const invalidCustomer: unknown = {
                 id: 2,
                 name: "John",
@@ -47,17 +47,17 @@ describe("CustomerService", () => {
                 .toThrow("Invalid customer type");
         });
 
-        it("odrzuca null", () => {
+        it("rejects null", () => {
             expect(() => customerService.addCustomer(null))
                 .toThrow("Invalid customer type");
         });
 
-        it("odrzuca tablicę zamiast obiektu", () => {
+        it("rejects an array instead of an object", () => {
             expect(() => customerService.addCustomer([customer]))
                 .toThrow("Invalid customer type");
         });
 
-        it("odrzuca klienta z pustym imieniem", () => {
+        it("rejects a customer with an empty name", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 2,
@@ -65,7 +65,7 @@ describe("CustomerService", () => {
             })).toThrow("Invalid customer name");
         });
 
-        it("odrzuca klienta z pustym emailem", () => {
+        it("rejects a customer with an empty email", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 2,
@@ -73,7 +73,7 @@ describe("CustomerService", () => {
             })).toThrow("Invalid customer email");
         });
 
-        it("odrzuca klienta z pustym numerem telefonu", () => {
+        it("rejects a customer with an empty phone number", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 2,
@@ -81,7 +81,7 @@ describe("CustomerService", () => {
             })).toThrow("Invalid customer phone");
         });
 
-        it("odrzuca klienta z pustym adresem", () => {
+        it("rejects a customer with an empty address", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 2,
@@ -89,25 +89,25 @@ describe("CustomerService", () => {
             })).toThrow("Invalid customer address");
         });
 
-        it("odrzuca klienta z niepoprawnym ID", () => {
+        it("rejects a customer with an invalid ID", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: -1
             })).toThrow("Invalid customer ID");
         });
 
-        it("odrzuca klienta z niecałkowitym ID", () => {
+        it("rejects a customer with a non-integer ID", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 1.5
             })).toThrow("Invalid customer ID");
         });
 
-        it("odrzuca klienta z duplikatem ID", () => {
+        it("rejects a customer with a duplicate ID", () => {
             expect(() => customerService.addCustomer(customer)).toThrow();
         });
 
-        it("nie dodaje klienta po nieudanej walidacji", () => {
+        it("does not add a customer after failed validation", () => {
             expect(() => customerService.addCustomer({
                 ...customer,
                 id: 2,
@@ -119,30 +119,30 @@ describe("CustomerService", () => {
     });
 
     describe("getCustomer()", () => {
-        it("zwraca klienta, jeśli ID istnieje", () => {
+        it("returns a customer if the ID exists", () => {
             expect(customerService.getCustomer(1)).toEqual(customer);
         });
 
-        it("zwraca undefined, jeśli klient nie istnieje", () => {
+        it("returns undefined if the customer does not exist", () => {
             expect(customerService.getCustomer(999)).toBeUndefined();
         });
 
-        it("odrzuca niecałkowite ID", () => {
+        it("rejects a non-integer ID", () => {
             expect(() => customerService.getCustomer(1.5))
                 .toThrow("Id should be ineteger");
         });
 
-        it("odrzuca ID równe zero", () => {
+        it("rejects an ID equal to zero", () => {
             expect(() => customerService.getCustomer(0))
                 .toThrow("Id should be grater than 0");
         });
 
-        it("odrzuca ujemne ID", () => {
+        it("rejects a negative ID", () => {
             expect(() => customerService.getCustomer(-1))
                 .toThrow("Id should be grater than 0");
         });
 
-        it("nie pozwala zmienić klienta przez modyfikację zwróconej kopii", () => {
+        it("prevents modifying the customer by changing the returned copy", () => {
             const result = customerService.getCustomer(1);
 
             if (!result) throw new Error("Customer not found");
@@ -154,7 +154,7 @@ describe("CustomerService", () => {
     });
 
     describe("updateCustomer()", () => {
-        it("aktualizuje imię klienta", () => {
+        it("updates the customer's name", () => {
             const result = customerService.updateCustomer(1, {
                 name: "John"
             });
@@ -162,7 +162,7 @@ describe("CustomerService", () => {
             expect(result?.name).toBe("John");
         });
 
-        it("aktualizuje email klienta", () => {
+        it("updates the customer's email", () => {
             const result = customerService.updateCustomer(1, {
                 email: "john@gmail.com"
             });
@@ -170,7 +170,7 @@ describe("CustomerService", () => {
             expect(result?.email).toBe("john@gmail.com");
         });
 
-        it("aktualizuje numer telefonu klienta", () => {
+        it("updates the customer's phone number", () => {
             const result = customerService.updateCustomer(1, {
                 phone: "987654321"
             });
@@ -178,7 +178,7 @@ describe("CustomerService", () => {
             expect(result?.phone).toBe("987654321");
         });
 
-        it("aktualizuje adres klienta", () => {
+        it("updates the customer's address", () => {
             const result = customerService.updateCustomer(1, {
                 address: "Berlin"
             });
@@ -186,7 +186,7 @@ describe("CustomerService", () => {
             expect(result?.address).toBe("Berlin");
         });
 
-        it("aktualizuje wszystkie pola jednocześnie", () => {
+        it("updates all fields simultaneously", () => {
             const result = customerService.updateCustomer(1, {
                 name: "John",
                 email: "john@gmail.com",
@@ -203,7 +203,7 @@ describe("CustomerService", () => {
             });
         });
 
-        it("zachowuje niezmienione pola", () => {
+        it("preserves unchanged fields", () => {
             const result = customerService.updateCustomer(1, {
                 name: "John"
             });
@@ -217,42 +217,42 @@ describe("CustomerService", () => {
             });
         });
 
-        it("odrzuca pustą nazwę", () => {
+        it("rejects an empty name", () => {
             expect(() => customerService.updateCustomer(1, {
                 name: "   "
             })).toThrow("Invalid customer name");
         });
 
-        it("odrzuca pusty email", () => {
+        it("rejects an empty email", () => {
             expect(() => customerService.updateCustomer(1, {
                 email: "   "
             })).toThrow("Invalid customer email");
         });
 
-        it("odrzuca pusty numer telefonu", () => {
+        it("rejects an empty phone number", () => {
             expect(() => customerService.updateCustomer(1, {
                 phone: "   "
             })).toThrow("Invalid customer phone");
         });
 
-        it("odrzuca pusty adres", () => {
+        it("rejects an empty address", () => {
             expect(() => customerService.updateCustomer(1, {
                 address: "   "
             })).toThrow("Invalid customer address");
         });
 
-        it("odrzuca aktualizację bez przekazanych pól", () => {
+        it("rejects an update with no fields provided", () => {
             expect(() => customerService.updateCustomer(1, {}))
                 .toThrow("No fields provided for update");
         });
 
-        it("zwraca undefined dla nieistniejącego klienta", () => {
+        it("returns undefined if the customer does not exist", () => {
             expect(customerService.updateCustomer(999, {
                 name: "John"
             })).toBeUndefined();
         });
 
-        it("nie zmienia danych klienta po nieudanej aktualizacji", () => {
+        it("does not modify customer data after a failed update", () => {
             expect(() => customerService.updateCustomer(1, {
                 name: "   "
             })).toThrow("Invalid customer name");

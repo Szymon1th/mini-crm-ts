@@ -8,7 +8,7 @@ describe("ProductService", () => {
 
     const keyboard: Product = {
         id: 1,
-        name: "Klawiatura",
+        name: "Keyboard",
         price: 150,
         stock: 10
     };
@@ -19,10 +19,10 @@ describe("ProductService", () => {
     });
 
     describe("addProduct()", () => {
-        it("dodaje poprawny produkt", () => {
+        it("adds a valid product", () => {
             const mouse: Product = {
                 id: 2,
-                name: "Mysz",
+                name: "Mouse",
                 price: 80,
                 stock: 5
             };
@@ -31,10 +31,10 @@ describe("ProductService", () => {
             expect(productService.getProduct(2)).toEqual(mouse);
         });
 
-        it("odrzuca produkt z niepoprawną strukturą", () => {
+        it("rejects a product with an invalid structure", () => {
             const invalidProduct: unknown = {
                 id: 2,
-                name: "Mysz",
+                name: "Mouse",
                 price: 80
             };
 
@@ -42,17 +42,17 @@ describe("ProductService", () => {
                 .toThrow("Invalid product type");
         });
 
-        it("odrzuca null", () => {
+        it("rejects null", () => {
             expect(() => productService.addProduct(null))
                 .toThrow("Invalid product type");
         });
 
-        it("odrzuca tablicę zamiast obiektu", () => {
+        it("rejects an array instead of an object", () => {
             expect(() => productService.addProduct([keyboard]))
                 .toThrow("Invalid product type");
         });
 
-        it("odrzuca produkt z pustą nazwą", () => {
+        it("rejects a product with an empty name", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -60,7 +60,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product name");
         });
 
-        it("odrzuca nazwę dłuższą niż 16 znaków", () => {
+        it("rejects a product name longer than 16 characters", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -68,7 +68,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product name");
         });
 
-        it("odrzuca ujemną cenę", () => {
+        it("rejects a negative price", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -76,7 +76,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product price");
         });
 
-        it("odrzuca cenę NaN", () => {
+        it("rejects a NaN price", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -84,7 +84,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product price");
         });
 
-        it("odrzuca nieskończoną cenę", () => {
+        it("rejects an infinite price", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -92,7 +92,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product price");
         });
 
-        it("akceptuje cenę równą zero", () => {
+        it("accepts a price equal to zero", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -100,7 +100,7 @@ describe("ProductService", () => {
             })).not.toThrow();
         });
 
-        it("odrzuca ujemny stock", () => {
+        it("rejects negative stock", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -108,7 +108,7 @@ describe("ProductService", () => {
             })).toThrow("Invalid product stock");
         });
 
-        it("odrzuca niecałkowity stock", () => {
+        it("rejects non-integer stock", () => {
             expect(() => productService.addProduct({
                 ...keyboard,
                 id: 2,
@@ -116,21 +116,21 @@ describe("ProductService", () => {
             })).toThrow("Invalid product stock");
         });
 
-        it("odrzuca produkt z duplikatem ID", () => {
+        it("rejects a product with a duplicate ID", () => {
             expect(() => productService.addProduct(keyboard)).toThrow();
         });
     });
 
     describe("getProduct()", () => {
-        it("zwraca produkt o podanym ID", () => {
+        it("returns the product with the specified ID", () => {
             expect(productService.getProduct(1)).toEqual(keyboard);
         });
 
-        it("zwraca undefined dla nieistniejącego produktu", () => {
+        it("returns undefined if the product does not exist", () => {
             expect(productService.getProduct(999)).toBeUndefined();
         });
 
-        it("nie pozwala zmienić produktu przez modyfikację zwróconej kopii", () => {
+        it("prevents modifying the product by changing the returned copy", () => {
             const product = productService.getProduct(1);
 
             if (!product) throw new Error("Product not found");
@@ -142,15 +142,15 @@ describe("ProductService", () => {
     });
 
     describe("updateProduct()", () => {
-        it("aktualizuje nazwę produktu", () => {
+        it("updates the product's name", () => {
             const result = productService.updateProduct(1, {
-                name: "Mysz"
+                name: "Mouse"
             });
 
-            expect(result?.name).toBe("Mysz");
+            expect(result?.name).toBe("Mouse");
         });
 
-        it("aktualizuje cenę produktu", () => {
+        it("updates the product's price", () => {
             const result = productService.updateProduct(1, {
                 price: 200
             });
@@ -158,7 +158,7 @@ describe("ProductService", () => {
             expect(result?.price).toBe(200);
         });
 
-        it("aktualizuje stock produktu", () => {
+        it("updates the product's stock", () => {
             const result = productService.updateProduct(1, {
                 stock: 20
             });
@@ -166,84 +166,84 @@ describe("ProductService", () => {
             expect(result?.stock).toBe(20);
         });
 
-        it("aktualizuje kilka pól jednocześnie", () => {
+        it("updates multiple fields simultaneously", () => {
             const result = productService.updateProduct(1, {
-                name: "Mysz",
+                name: "Mouse",
                 price: 80,
                 stock: 5
             });
 
             expect(result).toEqual({
                 id: 1,
-                name: "Mysz",
+                name: "Mouse",
                 price: 80,
                 stock: 5
             });
         });
 
-        it("zachowuje niezmienione pola produktu", () => {
+        it("preserves unchanged product fields", () => {
             const result = productService.updateProduct(1, {
-                name: "Mysz"
+                name: "Mouse"
             });
 
             expect(result).toEqual({
                 id: 1,
-                name: "Mysz",
+                name: "Mouse",
                 price: 150,
                 stock: 10
             });
         });
 
-        it("zwraca undefined dla nieistniejącego produktu", () => {
+        it("returns undefined if the product does not exist", () => {
             expect(productService.updateProduct(999, {
-                name: "Mysz"
+                name: "Mouse"
             })).toBeUndefined();
         });
 
-        it("odrzuca pustą nazwę", () => {
+        it("rejects an empty name", () => {
             expect(() => productService.updateProduct(1, {
                 name: "   "
             })).toThrow("Invalid product name");
         });
 
-        it("odrzuca zbyt długą nazwę", () => {
+        it("rejects a name that is too long", () => {
             expect(() => productService.updateProduct(1, {
                 name: "VeryLongProductName"
             })).toThrow("Invalid product name");
         });
 
-        it("odrzuca ujemną cenę", () => {
+        it("rejects a negative price", () => {
             expect(() => productService.updateProduct(1, {
                 price: -10
             })).toThrow("Invalid product price");
         });
 
-        it("odrzuca niepoprawny stock", () => {
+        it("rejects invalid stock", () => {
             expect(() => productService.updateProduct(1, {
                 stock: 1.5
             })).toThrow("Invalid product stock");
         });
 
-        it("odrzuca aktualizację bez podanych pól", () => {
+        it("rejects an update with no fields provided", () => {
             expect(() => productService.updateProduct(1, {}))
                 .toThrow("No fields provided for update");
         });
     });
 
     describe("decreaseStock()", () => {
-        it("zmniejsza stan magazynowy", () => {
+        it("decreases the product's stock", () => {
             const result = productService.decreaseStock(1, 3);
 
             expect(result?.stock).toBe(7);
             expect(productService.getProduct(1)?.stock).toBe(7);
         });
 
-        it("zwraca undefined dla nieistniejącego produktu", () => {
+        it("returns undefined if the product does not exist", () => {
             expect(productService.decreaseStock(999, 2)).toBeUndefined();
         });
 
         it.each([0, -1, 1.5, NaN, Infinity])(
-            "odrzuca nieprawidłową ilość: %s",
+            "rejects an invalid quantity: %s",
             quantity => {
                 expect(() => productService.decreaseStock(1, quantity))
                     .toThrow("Invalid product quantity");
@@ -252,14 +252,14 @@ describe("ProductService", () => {
             }
         );
 
-        it("odrzuca zmniejszenie stocku poniżej zera", () => {
+        it("rejects decreasing stock below zero", () => {
             expect(() => productService.decreaseStock(1, 11))
                 .toThrow("Insufficient product stock");
 
             expect(productService.getProduct(1)?.stock).toBe(10);
         });
 
-        it("pozwala zmniejszyć stock dokładnie do zera", () => {
+        it("allows decreasing stock exactly to zero", () => {
             const result = productService.decreaseStock(1, 10);
 
             expect(result?.stock).toBe(0);
@@ -267,19 +267,19 @@ describe("ProductService", () => {
     });
 
     describe("increaseStock()", () => {
-        it("zwiększa stan magazynowy", () => {
+        it("increases the product's stock", () => {
             const result = productService.increaseStock(1, 5);
 
             expect(result?.stock).toBe(15);
             expect(productService.getProduct(1)?.stock).toBe(15);
         });
 
-        it("zwraca undefined dla nieistniejącego produktu", () => {
+        it("returns undefined if the product does not exist", () => {
             expect(productService.increaseStock(999, 2)).toBeUndefined();
         });
 
         it.each([0, -1, 1.5, NaN, Infinity])(
-            "odrzuca nieprawidłową ilość: %s",
+            "rejects an invalid quantity: %s",
             quantity => {
                 expect(() => productService.increaseStock(1, quantity))
                     .toThrow("Invalid product quantity");
@@ -288,19 +288,19 @@ describe("ProductService", () => {
             }
         );
 
-        it("odrzuca nieprawidłowe ID produktu", () => {
+        it("rejects an invalid product ID", () => {
             expect(() => productService.increaseStock(-1, 2))
                 .toThrow("ProductID should be greater than 0");
         });
 
-        it("odrzuca ID przekraczające bezpieczny zakres", () => {
+        it("rejects an ID exceeding the safe integer range", () => {
             expect(() => productService.increaseStock(
                 Number.MAX_SAFE_INTEGER + 1,
                 2
             )).toThrow("ProductID is not a safe integer");
         });
 
-        it("odrzuca stock przekraczający Number.MAX_SAFE_INTEGER", () => {
+        it("rejects stock exceeding Number.MAX_SAFE_INTEGER", () => {
             productService.updateProduct(1, {
                 stock: Number.MAX_SAFE_INTEGER
             });
